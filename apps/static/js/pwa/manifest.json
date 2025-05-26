@@ -1,6 +1,7 @@
 {
   "name": "Gidana",
   "short_name": "Gidana",
+  "description":"Easily find a house or land for rent or sale anywhere in the world.",
   "icons": [
     {
       "src": "./icons/icon-192.png",
