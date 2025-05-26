@@ -1,0 +1,22 @@
+{
+    "starlink": {
+        "basic": {
+            "price": 50,
+            "currency": "$"
+        },
+        "standard": {
+            "price": 150,
+            "currency": "$"
+        },
+        "premium": {
+            "price": 500,
+            "currency": "$"
+        }
+    },
+    "tv": {
+        "canal+": {
+            "price": 30,
+            "currency": "$"
+        }
+    }
+}

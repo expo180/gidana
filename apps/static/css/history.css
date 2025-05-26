@@ -1,0 +1,33 @@
+@import url('./fonts.css');
+
+*{
+    font-family: 'Poppins', sans-serif;
+}
+.btn-purchase{
+    background: #270685;
+    color: #fff;
+}
+
+.btn-purchase:hover{
+    background: #1a0461;
+    color: #fff;
+}
+
+.badge {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 0.25rem;
+}
+
+.badge.bg-success {
+    background-color: #28a745;
+}
+
+.badge.bg-danger {
+    background-color: #dc3545;
+}
+
+.badge.bg-warning {
+    background-color: #ffc107;
+}

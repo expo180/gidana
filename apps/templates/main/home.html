@@ -1,0 +1,102 @@
+{% extends "main/base.html" %}
+{% block styles %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+{% endblock %}
+{% block content %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }}" role="alert">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle-fill" viewBox="0 0 16 16">
+                    <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2"/>
+                </svg>
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+<div class="home-content">
+    <!-- Hero section -->
+    <section class="hero-section mb-4">
+        <div class="hero-container p-4 rounded-3">
+            <div class="hero-content">
+                <img src="{{ url_for('static', filename='media/hero-img.jpeg') }}" alt="House icon" class="hero-image">
+                <div class="hero-text">
+                    <h1 class="hero-title">{{ _('Trouvez votre logement idéal') }}</h1>
+                    <p class="hero-subtitle">{{ _('Des milliers de propriétés à louer ou acheter près de chez vous') }}</p>
+                    <a href="{{ url_for('main.explore') }}" class="btn hero-button">{{ _('Explorer') }}</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Categories section -->
+    <section class="categories mb-4">
+        <h5 class="mb-3">{{ _('Catégories') }}</h5>
+        <div class="row g-3">
+            <div class="col-4">
+                <a href="{{ url_for('main.explore', type='Maison') }}" class="category-card text-decoration-none">
+                    <div class="card overflow-hidden border-0 shadow-sm">
+                        <img src="{{ url_for('static', filename='media/home.jpeg') }}" 
+                            class="img-fluid category-image" 
+                            alt="{{ _('Maisons traditionnelles africaines') }}"
+                            style="height: 80px; object-fit: cover;">
+                        <div class="card-body p-2 text-center">
+                            <small class="fw-bold text-dark">{{ _('Maisons') }}</small>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-4">
+                <a href="{{ url_for('main.explore', type='Appartement') }}" class="category-card text-decoration-none">
+                    <div class="card overflow-hidden border-0 shadow-sm">
+                        <img src="{{ url_for('static', filename='media/appartment.jpeg') }}" 
+                            class="img-fluid category-image" 
+                            alt="{{ _('Appartements modernes africains') }}"
+                            style="height: 80px; object-fit: cover;">
+                        <div class="card-body p-2 text-center">
+                            <small class="fw-bold text-dark">{{ _('Appartements') }}</small>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-4">
+                <a href="{{ url_for('main.explore', type='Terrain') }}" class="category-card text-decoration-none">
+                    <div class="card overflow-hidden border-0 shadow-sm">
+                        <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" 
+                            class="img-fluid category-image" 
+                            alt="{{ _('Terrains en Afrique') }}"
+                            style="height: 80px; object-fit: cover;">
+                        <div class="card-body p-2 text-center">
+                            <small class="fw-bold text-dark">{{ _('Terrains') }}</small>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Recommandations section -->
+    <section class="recommendations">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">{{ _('Recommandations') }}</h5>
+            <a href="{{ url_for('main.explore') }}" class="small text-success">{{ _('Voir tout') }}</a>
+        </div>
+        
+        <div class="row g-3">
+            {% for property in recommended_properties %}
+            <div class="col-12">
+                {% include 'properties/_property_card.html' %}
+            </div>
+            {% else %}
+            <div class="col-12 text-center py-4">
+                <i class="bi bi-house-x fs-1 text-muted"></i>
+                <p class="text-muted">{{ _('Aucune propriété disponible') }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+<div class="py-5"></div>
+{% endblock %}

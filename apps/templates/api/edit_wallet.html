@@ -1,0 +1,110 @@
+{% extends "api/base.html" %}
+
+{% block title %}{{ _('Modifier le Portefeuille') }}{% endblock %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/wallet.css') }}">
+    <link href="{{ url_for('static', filename='css/libs/select2.min.css') }}" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+<form method="POST" action="{{ url_for('api.edit_wallet', wallet_id=wallet.id) }}">
+    <h1 class="h3 mb-3 fw-normal">
+        {{ _('Modifier le portefeuille') }}
+    </h1>
+
+    <div class="mb-4">
+        <label for="walletProvider" class="form-label">{{ _('Fournisseur') }}</label>
+        <select name="provider" id="walletProvider" class="form-select wallet-provider-selector" required>
+            <option value="">{{ _('Sélectionnez un fournisseur') }}</option>
+            <option value="Nita" data-icon="{{ url_for('static', filename='brands/nita.jpeg') }}" {% if wallet.provider == "Nita" %}selected{% endif %}>
+                {{ _('Nita') }}
+            </option>
+            <option value="Visa" data-icon="{{ url_for('static', filename='brands/visa.svg') }}" {% if wallet.provider == "Visa" %}selected{% endif %}>
+                {{ _('Visa') }}
+            </option>
+            <option value="Mastercard" data-icon="{{ url_for('static', filename='brands/mastercard.svg') }}" {% if wallet.provider == "Mastercard" %}selected{% endif %}>
+                {{ _('Mastercard') }}
+            </option>
+            <option value="PayPal" data-icon="{{ url_for('static', filename='brands/paypal.svg') }}" {% if wallet.provider == "PayPal" %}selected{% endif %}>
+                {{ _('PayPal') }}
+            </option>
+        </select>
+    </div>
+
+    <div class="mb-3" id="phoneNumberField" style="display: {% if wallet.provider == 'Nita' %}block{% else %}none{% endif %};">
+        <label for="phoneNumber" class="form-label">{{ _('Numéro de téléphone') }}</label>
+        <input type="text" name="phone_number" class="form-control" id="phoneNumber" placeholder="{{ _('0612345678') }}" value="{{ wallet.phone_number }}">
+    </div>
+
+    <div class="mb-3" id="cardNumberField" style="display: {% if wallet.provider in ['Visa', 'Mastercard'] %}block{% else %}none{% endif %};">
+        <label for="cardNumber" class="form-label">{{ _('Numéro de carte') }}</label>
+        <input type="text" name="card_number" class="form-control" id="cardNumber" placeholder="{{ _('1234 5678 9012 3456') }}" value="{{ wallet.card_number }}">
+    </div>
+    
+    <div class="mb-3" id="cvvField" style="display: {% if wallet.provider in ['Visa', 'Mastercard'] %}block{% else %}none{% endif %};">
+        <label for="cvv" class="form-label">{{ _('CVV') }}</label>
+        <input type="text" name="cvv" class="form-control" id="cvv" placeholder="{{ _('123') }}" value="{{ wallet.cvv }}">
+    </div>
+
+    <div class="mb-3" id="expirationField" style="display: {% if wallet.provider in ['Visa', 'Mastercard'] %}block{% else %}none{% endif %};">
+        <label for="expirationDate" class="form-label">{{ _('Date d\'expiration') }}</label>
+        <input type="text" name="expiration_date" class="form-control" id="expirationDate" placeholder="{{ _('12/25') }}" value="{{ wallet.expiration_date }}">
+    </div>
+
+    <div class="mb-3" id="emailField" style="display: {% if wallet.provider == 'PayPal' %}block{% else %}none{% endif %};">
+        <label for="email" class="form-label">{{ _('Adresse e-mail') }}</label>
+        <input type="email" name="email" class="form-control" id="email" placeholder="{{ _('email@example.com') }}" value="{{ wallet.email }}">
+    </div>
+
+    <div class="mb-3">
+        <label for="currency" class="form-label">{{ _('Devise par défaut') }}</label>
+        <select name="currency" id="currency" class="form-select" required>
+            <option value="XOF" {% if wallet.currency == 'XOF' %}selected{% endif %}>XOF (Franc CFA)</option>
+            <option value="EUR" {% if wallet.currency == 'EUR' %}selected{% endif %}>EUR (Euro)</option>
+            <option value="USD" {% if wallet.currency == 'USD' %}selected{% endif %}>USD (Dollar américain)</option>
+            <option value="GBP" {% if wallet.currency == 'GBP' %}selected{% endif %}>GBP (Livre sterling)</option>
+            <!-- Add more currencies as needed -->
+        </select>
+    </div>
+
+    <div class="mb-3 form-check">
+        <input type="checkbox" name="selected" class="form-check-input" id="selected" {% if wallet.selected %}checked{% endif %}>
+        <label class="form-check-label" for="selected">{{ _('Définir comme portefeuille principal') }}</label>
+    </div>
+    
+    <button class="w-100 btn my-4 btn-md submit-btn" type="submit">
+        {{ _('Enregistrer') }}
+    </button>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/libs/jquery.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/libs/select2.min.js') }}"></script>
+<script>
+    $(document).ready(function() {
+        $('#walletProvider').select2({
+            templateResult: formatOption,
+            templateSelection: formatOption
+        });
+
+        function formatOption(option) {
+            if (!option.id) { return option.text; }
+            var $option = $(
+                '<div class="provider-option"><img src="' + $(option.element).data('icon') + '" /> ' + option.text + '</div>'
+            );
+            return $option;
+        }
+
+        $('#walletProvider').on('change', function() {
+            var provider = this.value;
+            document.getElementById("phoneNumberField").style.display = (provider === "Nita") ? "block" : "none";
+            document.getElementById("cardNumberField").style.display = (provider === "Visa" || provider === "Mastercard") ? "block" : "none";
+            document.getElementById("cvvField").style.display = (provider === "Visa" || provider === "Mastercard") ? "block" : "none";
+            document.getElementById("expirationField").style.display = (provider === "Visa" || provider === "Mastercard") ? "block" : "none";
+            document.getElementById("emailField").style.display = (provider === "PayPal") ? "block" : "none";
+        });
+    });
+</script>
+{% endblock %}

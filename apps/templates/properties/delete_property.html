@@ -1,0 +1,22 @@
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deletePropertyModal{{ property.id }}" tabindex="-1" aria-labelledby="deletePropertyModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deletePropertyModalLabel">{{ _('Confirmer la suppression') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {{ _('Êtes-vous sûr de vouloir supprimer cette propriété? Cette action est irréversible.') }}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Annuler') }}</button>
+                <form action="{{ url_for('property.delete_property', property_id=property.id) }}" method="POST">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash me-1"></i> {{ _('Supprimer') }}
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

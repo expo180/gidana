@@ -1,0 +1,92 @@
+<div class="card property-card border-0 rounded-4 shadow-sm overflow-hidden h-100">
+    <!-- Carousel -->
+    <div class="position-relative">
+        <div id="carousel-{{ property.id }}" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                {% if property.images %}
+                    {% for img in property.images %}
+                        <div class="carousel-item {% if loop.first %}active{% endif %}">
+                            <img src="{{ img.filename }}"
+                                 class="d-block w-100 object-fit-cover" style="height: 220px;" alt="{{ property.title }}">
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="carousel-item active">
+                        <img src="{{ url_for('static', filename='feedbacks/default-property.jpeg') }}"
+                             class="d-block w-100 object-fit-cover" style="height: 220px;" alt="Maison par défaut">
+                    </div>
+                {% endif %}
+            </div>
+
+            {% if property.images|length > 1 %}
+                <button class="carousel-control-prev" type="button" data-bs-target="#carousel-{{ property.id }}" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carousel-{{ property.id }}" data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                </button>
+            {% endif %}
+
+        </div>
+
+        <!-- Badges -->
+        {% if property.transaction_type %}
+            <span class="badge bg-success position-absolute top-0 start-0 m-2 text-uppercase">
+                {{ _(property.transaction_type) }}
+            </span>
+        {% endif %}
+    </div>
+
+    <!-- Card Body -->
+    <div class="card-body px-3 py-2 position-relative">
+        <button class="btn btn-light rounded-circle position-absolute top-0 end-0 m-2 shadow-sm favorite-btn"
+            data-property-id="{{ property.id }}"
+            aria-label="{{ _('Ajouter aux favoris') }}"
+            data-is-favorite="{% if current_user.is_authenticated and current_user in property.favorites|map(attribute='user') %}true{% else %}false{% endif %}">
+            <i class="bi {% if current_user.is_authenticated and current_user in property.favorites|map(attribute='user') %}bi-heart-fill text-danger{% else %}bi-heart{% endif %}"></i>
+        </button>
+
+        <h6 class="fw-semibold text-truncate mb-1" title="{{ property.title }}">{{ property.title }}</h6>
+        <div class="text-muted small mb-2">
+            <i class="bi bi-geo-alt me-1"></i> {{ property.neighborhood }}, {{ property.country }}
+        </div>
+        <div class="text-muted small mb-2">
+           {% if property.is_available %}
+                <span class="badge bg-primary">
+                    {{ _('Disponible') }}
+                </span>
+            {% endif %}
+        </div>
+
+        <!-- Details Section -->
+        <div class="property-details small text-muted">
+            {% if property.rooms %}
+            <div><i class="bi bi-door-open me-1"></i>{{ property.rooms }} {{ _('chambre' if property.rooms == 1 else 'chambres') }}</div>
+            {% endif %}
+            {% if property.bathrooms %}
+            <div>
+                <i class="bi bi-badge-wc me-1"></i>
+                {{ property.bathrooms }} {{ _('salle de bain' if property.bathrooms == 1 else 'salles de bains') }}
+                {% if property.shower_type %}
+                    {{ _('interne' if property.bathrooms == 1 else 'internes') }}
+                {% endif %}
+            </div>
+            {% endif %}
+            {% if property.surface %}
+            <div><i class="bi bi-arrows-angle-expand me-1"></i>{{ property.surface }} m²</div>
+            {% endif %}
+        </div>
+
+        <!-- Price + Action -->
+        <div class="d-flex justify-content-between align-items-center mt-2">
+            <span class="fw-bold text-success">
+                {{ property.price|format_currency(property.currency) }}{{ property.transaction_type|transaction_suffix }}
+                {{ _('/mois' if property.transaction_type == 'À louer')  }}
+            </span>
+            <a href="{{ url_for('property.detail', property_id=property.id) }}"
+               class="btn btn-sm btn-outline-success rounded-pill px-3">
+                {{ _('Voir') }}
+            </a>
+        </div>
+    </div>
+</div>

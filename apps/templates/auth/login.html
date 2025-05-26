@@ -1,0 +1,57 @@
+{% extends 'auth/base.html' %}
+{% block title %}{{ title }}{% endblock %}
+{% block styles %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth/login.css') }}">
+{% endblock %}
+{% block content %}
+<main class="form-signin w-100 m-auto pt-5">
+    <form method="POST" >
+        {{ form.hidden_tag() }}
+
+        <div class="text-center">
+            <span class="fw-bold fs-4 text-success d-block mb-2">Gidana</span>
+            <h1 class="h3 mb-3 fw-normal">{{ _('Connexion') }}</h1>
+        </div>
+
+
+        <div class="form-floating mb-2">
+            {{ form.identifier(class="form-control", id="userIdentifier", placeholder=_('N° de Téléphone ou Adresse E-mail')) }}
+            <label for="userIdentifier">
+                {{ _('N° de Téléphone ou Adresse E-mail') }} {% if 'required' in form.identifier.flags %}<span class="text-danger">*</span>{% endif %}
+            </label>
+        </div>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}" role="alert">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle-fill" viewBox="0 0 16 16">
+                            <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2"/>
+                        </svg>
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+
+        <div class="form-floating mb-2">
+            {{ form.password(class="form-control", id="userPassword", placeholder=_('Mot de Passe')) }}
+            <label for="userPassword">
+                {{ _('Mot de Passe') }} {% if 'required' in form.password.flags %}<span class="text-danger">*</span>{% endif %}
+            </label>
+        </div>
+        <a href="{{ url_for('auth.forgot_password') }}">{{ _('Mot de passe oublié') }}</a>
+
+        <div class="form-check text-start my-3">
+            {{  form.remember_me(class="form-check-input", id="flexCheckDefault") }}
+           {{ form.remember_me.label(class="form-check-label", for="flexCheckDefault") }}
+        </div>
+
+        {{ form.submit(class="w-100 btn btn-md submit-btn", type="submit", value=_('Connexion')) }}
+
+        <p class="mt-5 mb-3 text-body-secondary">{{ _('Vous n\'avez pas de compte ?') }} <a href="{{ url_for('auth.register') }}">{{ _('Inscrivez-vous') }}</a></p>
+        <p class="mt-5 mb-3 text-center text-body-secondary">&copy; {{ year }} Gidana All rights reserved</p>
+    </form>
+</main>
+{% endblock %}

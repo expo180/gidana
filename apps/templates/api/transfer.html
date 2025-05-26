@@ -1,0 +1,147 @@
+{% extends "main/base.html" %}
+{% block title %}<title>{{ title }}</title>{% endblock %}
+{% block styles %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/wallet.css') }}">
+    <link href="{{ url_for('static', filename='css/libs/select2.min.css') }}" rel="stylesheet" />
+    <link href="{{ url_for('static', filename='icons/font/bootstrap-icons.css') }}" rel="stylesheet">
+{% endblock %}
+{% block content %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }}" role="alert">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle-fill" viewBox="0 0 16 16">
+                    <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2"/>
+                </svg>
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+<div class="container mt-4">
+    <h2>{{ _('Transférer') }}</h2>
+    {% if selected_wallet %}
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="d-flex align-items-center">
+                {% set icon_extension = '.jpeg' if selected_wallet.provider == 'Nita' else '.svg' %}
+                <img src="{{ url_for('static', filename='brands/' + selected_wallet.provider|lower + icon_extension) }}"
+                     class="me-3" style="width: 40px; height: 40px;">
+                <div>
+                    <h5 class="mb-1">{{ selected_wallet.provider }} ({{ selected_wallet.currency }})</h5>
+                    <p class="mb-1 text-muted">
+                        {% if selected_wallet.provider == 'Nita' %}
+                            {{ mask_phone_number(selected_wallet.phone_number) }}
+                        {% elif selected_wallet.provider == 'PayPal' %}
+                            {{ mask_email(selected_wallet.email) }}
+                        {% elif selected_wallet.provider in ['Visa', 'Mastercard'] %}
+                            {{ mask_card_number(selected_wallet.card_number) }}
+                        {% endif %}
+                    </p>
+                    <p class="mb-0">
+                        <strong>{{ selected_wallet.balance }}</strong>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <form method="POST" action="{{ url_for('api.transfer_money') }}">
+        <input type="hidden" name="walletProvider" value="{{ selected_wallet.id if selected_wallet }}">
+
+        {% if selected_wallet and (selected_wallet.provider == 'Nita' or selected_wallet.provider == 'PayPal') %}
+            <div class="form-group mb-2">
+                <label for="password">{{ _('Mot de Passe') }}</label>
+                <input type="password" id="password" name="password" placeholder="{{ _('Votre mot de passe') }}" class="form-control" required>
+            </div>
+        {% endif %}
+
+        <div class="form-group mb-2">
+            <label for="transferMethod">{{ _('Méthode de Transfer') }}</label>
+            <select id="transferMethod" name="transferMethod" class="form-control">
+                <option value="mobile_money" data-icon="bi-phone" data-icon-color="text-primary">{{ _('Mobile Money') }}</option>
+                <option value="paypal" data-icon="bi-paypal" data-icon-color="text-info">{{ _('PayPal') }}</option>
+            </select>
+        </div>
+
+        <div id="mobileMoneyFields">
+            <div class="form-group mb-2">
+                <label for="recipientPhone">{{ _("N° du destinataire") }}</label>
+                <input type="tel" id="recipientPhone" name="recipientPhone" placeholder="{{ _('Le N° du destinataire') }}" class="form-control" required>
+            </div>
+        </div>
+
+        <div id="paypalFields" style="display: none;">
+            <div class="form-group mb-2">
+                <label for="recipientEmail">{{ _("Email Paypal du destinataire") }}</label>
+                <input type="email" id="recipientEmail" name="recipientEmail" placeholder="{{ _('Email Paypal du destinataire') }}" class="form-control" required>
+            </div>
+        </div>
+
+        <div class="form-group mb-2">
+            <label for="amount">{{ _('Montant') }}</label>
+            <div class="input-group">
+                <input type="number" id="amount" name="amount" placeholder="{{ _('Entrer le montant à envoyer') }}" class="form-control" required step="0.01" min="0.01">
+                <span class="input-group-text">{{ selected_wallet.currency if selected_wallet else 'XOF' }}</span>
+            </div>
+            <small class="text-muted">
+                {{ _('Disponible:') }} {{ selected_wallet.balance if selected_wallet }}
+            </small>
+        </div>
+
+        <div class="form-group mb-2">
+            <label for="description">{{ _('Description (Optionnel)') }}</label>
+            <textarea id="description" name="description" placeholder="{{ _('Ajouter une note') }}" class="form-control" rows="2"></textarea>
+        </div>
+
+        <button type="submit" class="w-100 btn my-4 btn-md submit-btn submit-btn">
+            <i class="bi bi-send"></i>
+            {{ _('Continuer') }}
+        </button>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/libs/jquery.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/libs/select2.min.js') }}"></script>
+<script>
+    $(document).ready(function() {
+        $('#transferMethod').select2({
+            templateResult: formatOption,
+            templateSelection: formatOption
+        });
+
+        function formatOption(option) {
+            if (!option.id) { return option.text; }
+
+            if ($(option.element).data('icon') && $(option.element).data('icon').startsWith('bi-')) {
+                return $(
+                    '<div class="provider-option">' +
+                    '<i class="bi ' + $(option.element).data('icon') + ' ' + $(option.element).data('icon-color') + ' me-2"></i>' +
+                    option.text +
+                    '</div>'
+                );
+            }
+            return option.text;
+        }
+        function toggleRecipientFields() {
+            const transferMethod = $('#transferMethod').val();
+
+            $('#mobileMoneyFields').hide();
+            $('#paypalFields').hide();
+
+            if (transferMethod === 'mobile_money') {
+                $('#mobileMoneyFields').show();
+            } else if (transferMethod === 'paypal') {
+                $('#paypalFields').show();
+            }
+        }
+
+        $('#transferMethod').on('change', toggleRecipientFields);
+        toggleRecipientFields();
+    });
+</script>
+<div class="py-3"></div>
+{% endblock %}

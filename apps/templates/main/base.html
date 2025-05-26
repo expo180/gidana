@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="{{ get_locale() }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <!-- Styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='icons/font/bootstrap-icons.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/libs/animate.min.css') }}">
+    <!-- Favicons -->
+    <link rel="icon" href="{{ url_for('static', filename='favicons/favicon.ico') }}" type="image/x-icon">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='favicons/apple-touch-icon.png') }}">
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="{{ url_for('static', filename='js/pwa/manifest.json') }}">
+    <!-- Android Chrome -->
+    <link rel="mask-icon" href="{{ url_for('static', filename='favicons/android-chrome-192x192.png') }}" color="#5bbad5">
+    <link rel="mask-icon" href="{{ url_for('static', filename='favicons/android-chrome-512x512.png') }}" color="#5bbad5">
+    {% block styles %}{% endblock %}
+</head>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.body.addEventListener('click', function(e) {
+            if (e.target.closest('.favorite-btn')) {
+                const button = e.target.closest('.favorite-btn');
+                const propertyId = button.dataset.propertyId;
+                const heartIcon = button.querySelector('i');
+                    
+                    
+                heartIcon.classList.toggle('bi-heart');
+                heartIcon.classList.toggle('bi-heart-fill');
+                heartIcon.classList.toggle('text-danger');
+                    
+                button.classList.add('animate__animated', 'animate__heartBeat');
+                setTimeout(() => {
+                    button.classList.remove('animate__animated', 'animate__heartBeat');
+                }, 1000);
+                    
+                fetch(`/property/toggle_favorite/${propertyId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'same-origin'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.success) {
+                        heartIcon.classList.toggle('bi-heart');
+                        heartIcon.classList.toggle('bi-heart-fill');
+                        heartIcon.classList.toggle('text-danger');
+                        console.error('Error:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    heartIcon.classList.toggle('bi-heart');
+                    heartIcon.classList.toggle('bi-heart-fill');
+                    heartIcon.classList.toggle('text-danger');
+                });
+            }
+        });
+    });
+</script>
+<body>
+    <header class="app-header">
+        <div class="container-fluid d-flex justify-content-between align-items-center">
+            <a href="{{ url_for('main.home') }}" class="text-decoration-none">
+                <span class="fw-bold fs-4 text-success">Gidana</span>
+                <!-- for later
+                    <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="App Logo" class="logo">
+                -->
+            </a>
+            
+            <div class="d-flex align-items-center">
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('property.add_property') }}" 
+                        class="add-property-btn me-2" 
+                        title="{{ _('Ajouter une propriété') }}">
+                        <i class="bi bi-plus-lg"></i>
+                    </a>
+                {% endif %}
+                    <a href="{{ url_for('main.user_settings') }}">
+                        <img src="{{ current_user.profile_picture or url_for('static', filename='feedbacks/account_circle_dark.svg') if current_user.is_authenticated else url_for('static', filename='feedbacks/account_circle_dark.svg') }}" 
+                         class="rounded-circle" width="36" height="36" alt="{{ _('Profil') }}">
+                    </a>
+            </div>
+        </div>
+    </header>
+    <div class="container d-flex flex-column min-vh-100">
+        <div class="content flex-grow-1 py-4">
+            {% block content %}{% endblock %}
+        </div>
+
+        <div class="bg-light fixed-bottom py-2 shadow-lg">
+            <div class="d-flex justify-content-around text-center">
+                <a href="{{ url_for('main.home') }}" class="text-decoration-none flex-fill py-2">
+                    <i class="bi {% if request.path == url_for('main.home') %}bi-house-fill selected-tab{% else %}bi-house text-dark{% endif %} fs-4"></i>
+                </a>
+
+                <a href="{{ url_for('main.explore') }}" class="text-decoration-none flex-fill py-2">
+                    <i class="bi {% if request.path == url_for('main.explore') %}bi-compass-fill selected-tab{% else %}bi-compass text-dark{% endif %} fs-4"></i>
+                </a>
+
+                <a href="{{ url_for('main.favourites') }}" class="text-decoration-none flex-fill py-2">
+                    <i class="bi {% if request.path == url_for('main.favourites') %}bi-heart-fill selected-tab{% else %}bi-heart text-dark{% endif %} fs-4"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal fade" id="loadingSpinner" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-transparent border-0">
+                <div class="d-flex justify-content-center">
+                    <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Show spinner on page transitions
+        document.addEventListener('DOMContentLoaded', function() {
+            // Show spinner when clicking links
+            document.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    // Don't show spinner for external links or links with data-no-spinner attribute
+                    if (!this.href.includes(window.location.host) || this.hasAttribute('data-no-spinner')) {
+                        return;
+                    }
+                    
+                    const loadingSpinner = new bootstrap.Modal(document.getElementById('loadingSpinner'));
+                    loadingSpinner.show();
+                });
+            });
+        
+            // Show spinner on form submissions
+            document.querySelectorAll('form').forEach(form => {
+                form.addEventListener('submit', function() {
+                    const loadingSpinner = new bootstrap.Modal(document.getElementById('loadingSpinner'));
+                    loadingSpinner.show();
+                });
+            });
+        
+            window.addEventListener('load', function() {
+                const spinner = bootstrap.Modal.getInstance(document.getElementById('loadingSpinner'));
+                if (spinner) spinner.hide();
+            });
+        });
+    </script>
+    {% block scripts %}
+        <script src="{{ url_for('static', filename='js/libs/bootstrap.bundle.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/libs/popper.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/libs/autosize.min.js') }}"></script>
+    {% endblock %}
+</body>
+</html>

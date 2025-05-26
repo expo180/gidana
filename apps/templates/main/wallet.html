@@ -1,0 +1,127 @@
+{% extends "main/base.html" %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/wallet.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='icons/font/bootstrap-icons.css') }}" />
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-xl-6 mb-xl-0 mb-4">
+        <div class="card bg-dark shadow-xl">
+            <div class="overflow-hidden position-relative border-radius-xl">
+                <img src="{{ url_for('static', filename='media/pattern-tree.svg') }}" class="position-absolute opacity-2 start-0 top-0 w-100 z-index-1 h-100" alt="pattern-tree">
+                <span class="bg-dark"></span>
+                <div class="card-body position-relative z-index-1 p-3">
+                    <i class="bi bi-wifi text-white"></i>
+                    <h5 class="text-white mt-4 mb-5 pb-2">
+                        {% if selected_wallet %}
+                            {% if selected_wallet.provider in ['Visa', 'Mastercard'] %}
+                                ****&nbsp;&nbsp;&nbsp;****&nbsp;&nbsp;&nbsp;****&nbsp;&nbsp;&nbsp;{{ selected_wallet.card_number[-4:] }}
+                            {% elif selected_wallet.provider == 'Nita' %}
+                                {{ selected_wallet.phone_number }}
+                            {% elif selected_wallet.provider == 'PayPal' %}
+                                {{ selected_wallet.email }}
+                            {% endif %}
+                        {% else %}
+                            ****&nbsp;&nbsp;&nbsp;****&nbsp;&nbsp;&nbsp;****&nbsp;&nbsp;&nbsp;7852
+                        {% endif %}
+                    </h5>
+                    <div class="d-flex">
+                        <div class="d-flex">
+                            {% if selected_wallet and selected_wallet.provider in ['Visa', 'Mastercard'] %}
+                                <div class="me-4">
+                                    <p class="text-white text-sm opacity-8 mb-0">{{ _('Card Holder') }}</p>
+                                    <h6 class="text-white mb-0">
+                                        {{ current_user.username }}
+                                    </h6>
+                                </div>
+                                <div>
+                                    <p class="text-white text-sm opacity-8 mb-0">{{ _('Expires') }}</p>
+                                    <h6 class="text-white mb-0">
+                                        {{ selected_wallet.expiration_date }}
+                                    </h6>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="ms-auto w-20 d-flex align-items-end justify-content-end">
+                            {% set provider_name = (selected_wallet.provider|lower if selected_wallet else 'mastercard') %}
+                            {% set file_extension = '.jpeg' if selected_wallet and selected_wallet.provider == 'Nita' else '.svg' %}
+                            <img width="50" src="{{ url_for('static', filename='brands/' + provider_name + file_extension) }}" alt="logo">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12 mb-lg-0 mb-4">
+        <div class="card mt-4">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-6 d-flex align-items-center">
+                        <h6 class="mb-0">{{ _('Méthodes de paiement') }}</h6>
+                    </div>
+                    <div class="col-6 text-end">
+                        <a class="btn bg-gradient-dark mb-0" href="{{ url_for('api.add_wallet') }}">
+                            <i class="bi bi-plus-circle-dotted"></i>
+                            {{ _('Ajouter') }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-3">
+                <div class="row">
+                    {% for wallet in wallets %}
+                        <div class="col-md-6 mb-md-0 mb-4">
+                            <div class="card card-body border card-plain border-radius-lg d-flex align-items-center flex-row">
+                                {% set provider_name = wallet.provider|lower %}
+                                {% set file_extension = '.jpeg' if wallet.provider == 'Nita' else '.svg' %}
+                                <img class="w-10 me-3 mb-0" width="30" src="{{ url_for('static', filename='brands/' + provider_name + file_extension) }}" alt="logo">
+                                <h6 class="mb-0">
+                                    {% if wallet.provider in ['Visa', 'Mastercard'] %}
+                                        ****&nbsp;&nbsp;&nbsp;****&nbsp;&nbsp;&nbsp;****&nbsp;&nbsp;&nbsp;{{ wallet.card_number[-4:] }}
+                                    {% elif wallet.provider == 'Nita' %}
+                                        {{ wallet.phone_number }}
+                                    {% elif wallet.provider == 'PayPal' %}
+                                        {{ wallet.email }}
+                                    {% endif %}
+                                </h6>
+                                <div class="dropdown ms-auto">
+                                    <i class="bi bi-three-dots-vertical text-dark cursor-pointer" id="dropdownMenuButton{{ wallet.id }}" data-bs-toggle="dropdown" aria-expanded="false"></i>
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{ wallet.id }}">
+                                        <li>
+                                            <a class="dropdown-item" href="{{ url_for('api.edit_wallet', wallet_id=wallet.id) }}">
+                                                <i class="bi bi-pencil me-2"></i>{{ _('Modifier') }}
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item text-danger" href="{{ url_for('api.delete_wallet', wallet_id=wallet.id) }}" onclick="return confirm('{{ _('Etes vous sûre de vouloir supprimer ce portefeuille?') }}');">
+                                                <i class="bi bi-trash me-2"></i>{{ _('Supprimer') }}
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        {% include 'empty/no_wallet.html' %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/libs/jquery.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/libs/bootstrap.bundle.min.js') }}"></script>
+<script>
+    $(document).ready(function() {
+        $('[data-bs-toggle="tooltip"]').tooltip();
+    });
+</script>
+{% endblock %}

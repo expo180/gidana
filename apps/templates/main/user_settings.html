@@ -1,0 +1,84 @@
+{% extends "main/base.html" %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">
+        <a href="{{ request.referrer or url_for('main.home') }}" class="text-decoration-none me-2">
+            <i class="bi bi-arrow-left fs-4 text-success"></i>
+        </a>
+        {{ title }}
+    </h2>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}" role="alert">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle-fill" viewBox="0 0 16 16">
+                        <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2"/>
+                    </svg>
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+
+    <form method="POST" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <div class="text-center mb-4">
+            <div class="profile-image-wrapper">
+                <img id="profileImagePreview" src="{{ current_user.profile_picture or url_for('static', filename='feedbacks/account_circle_dark.svg') }}" class="rounded-circle" alt="{{ _('Profile Image') }}" style="width: 150px; height: 150px; object-fit: cover;">
+                {{ form.profile_picture(class="visually-hidden", id="profileImageInput", accept="image/*") }}
+                <label for="profileImageInput" class="btn btn-submit mt-2">
+                    <i class="bi bi-pencil-fill"></i>
+                    {{ _('Modifier') }}
+                </label>
+            </div>
+        </div>
+        <hr class="my-4" />
+        <div class="mb-3">
+            <label for="first_name" class="form-label">{{ _('Prénom') }}</label>
+            {{ form.first_name(class="form-control", placeholder=_('Massimo')) }}
+        </div>
+        <div class="mb-3">
+            <label for="last_name" class="form-label">{{ _('Nom') }}</label>
+            {{ form.last_name(class="form-control", placeholder=_('Vignelli')) }}
+        </div>
+        <div class="mb-3">
+            <label for="phone_number" class="form-label">{{ _('Numéro de téléphone') }}</label>
+            {{ form.phone_number(class="form-control") }}
+        </div>
+        <div class="mb-3">
+            <label for="email" class="form-label">{{ _('Email') }}</label>
+            {{ form.email(class="form-control", placeholder=_('exemple@gmail.com')) }}
+        </div>
+        <div class="mb-3">
+            <label for="gender" class="form-label">{{ _('Genre') }}</label>
+            {{ form.gender(class="form-select") }}
+        </div>
+        <div class="mb-3">
+            <label for="date_of_birth" class="form-label">{{ _('Date de naissance') }}</label>
+            {{ form.date_of_birth(class="form-control") }}
+        </div>
+        <div class="mb-3">
+            {{ form.submit(class="btn btn-success btn-lg w-100") }}
+        </div>
+    </form>
+    <div class="py-5"></div>
+</div>
+<script>
+    document.getElementById('profileImageInput').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('profileImagePreview').src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
+{% endblock %}

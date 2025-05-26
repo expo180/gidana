@@ -1,0 +1,63 @@
+{% extends "main/base.html" %}
+{% block title %}<title>{{ title }}</title>{% endblock %}
+{% block styles %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/wallet.css') }}">
+    <link href="{{ url_for('static', filename='css/libs/select2.min.css') }}" rel="stylesheet" />
+    <link href="{{ url_for('static', filename='icons/font/bootstrap-icons.css') }}" rel="stylesheet">
+{% endblock %}
+{% block content %}
+<div class="container  mt-4">
+    <div class="icon-container text-center mb-3">
+        {% if payment_details.service_type == 'network' %}
+            <i class="bi bi-wifi text-danger" style="font-size: 5rem;"></i>
+        {% else %}
+            <i class="bi bi-lightning-charge text-primary" style="font-size: 2rem;"></i>
+        {% endif %}
+    </div>
+    <div class="payment-details text-center mb-4">
+        <p class="display-4 fw-bold" style="color: #ff0000; background-color: #fff0ef; padding: 10px; border-radius: 10px;">
+            -{{ payment_details.currency }}{{ payment_details.total_amount }}
+        </p>
+    </div>
+
+    <!-- Table for Service Information -->
+    <div class="table-responsive mt-4">
+        <table class="table table-bordered table-hover">
+            <tbody>
+                <tr>
+                    <td>{{ _('Type de service') }}</td>
+                    <td>{{ payment_details.service_type }}</td>
+                </tr>
+                <tr>
+                    <td>{{ _('Fournisseur') }}</td>
+                    <td>{{ payment_details.provider }}</td>
+                </tr>
+                {% if payment_details.service_type == 'network' and payment_details.provider == 'starlink' %}
+                <tr>
+                    <td>{{ _('Plan') }}</td>
+                    <td>{{ payment_details.plan }}</td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <td>{{ _('Prix de base') }}</td>
+                    <td>{{ payment_details.base_price }} {{ payment_details.currency }}</td>
+                </tr>
+                <tr>
+                    <td>{{ _('Frais de service') }}</td>
+                    <td>10%</td>
+                </tr>
+                <tr>
+                    <td>{{ _('Montant total') }}</td>
+                    <td>{{ payment_details.total_amount }} {{ payment_details.currency }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="actions mt-4">
+        <form method="POST" action="{{ url_for('api.process_payment') }}">
+            <button type="submit" class="btn w-100 btn-md submit-btn">{{ _('Continuer') }}</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

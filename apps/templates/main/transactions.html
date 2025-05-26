@@ -1,0 +1,70 @@
+{% extends "main/base.html" %}
+{% block title %}<title>{{ title }}</title>{% endblock %}
+{% block styles %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/history.css') }}">
+{% endblock %}
+{% block content %}
+    <h1>{{ _('Récents') }}</h1>
+
+    {% if transactions.items %}
+        <ul class="list-group">
+            {% for transaction in transactions.items %}
+                <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                        {% if transaction.service == 'network' and transaction.service_provider == 'starlink' %}
+                            <img src="{{ url_for('static', filename='brands/starlink.png') }}" alt="{{ transaction.service_provider }} Logo" class="me-3" style="width: 45px; height: 45x;">
+                        {% endif %}
+                        <div>
+                            <h6 class="mb-1">{{ transaction.service_provider | capitalize }}</h6>
+                            <small class="text-muted">{{ transaction.created_at.strftime('%d %B %Y %H:%M') }}</small>
+                            <span class="badge bg-{{ 'success' if transaction.status.value == 'done' else 'danger' if transaction.status.value == 'failed' else 'warning' }} text-xs mt-1">
+                                {% if transaction.status.value == 'done' %}
+                                    {{ _('Effectué') }}
+                                {% elif transaction.status.value == 'failed' %}
+                                    {{ _('Echec') }}
+                                {% else %}
+                                    {{ _('En cours') }}
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                    <span class="text-{{ 'success' if transaction.nature == 'income' else 'danger' }}">
+                        {{ '+' if transaction.nature == 'income' else '-' }} {{ transaction.amount }} {{ transaction.currency }}
+                    </span>
+                </a>
+            {% endfor %}
+        </ul>
+
+        <nav aria-label="Transaction pagination">
+            <ul class="pagination justify-content-center mt-4">
+                {% if transactions.has_prev %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('main.transactions', page=transactions.prev_num) }}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+
+                {% for page_num in transactions.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                    {% if page_num %}
+                        <li class="page-item {{ 'active' if transactions.page == page_num else '' }}">
+                            <a class="page-link" href="{{ url_for('main.transactions', page=page_num) }}">{{ page_num }}</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if transactions.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('main.transactions', page=transactions.next_num) }}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% else %}
+        {% include 'empty/no_transaction.html' %}
+    {% endif %}
+{% endblock %}

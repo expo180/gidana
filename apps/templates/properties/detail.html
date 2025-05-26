@@ -1,0 +1,219 @@
+{% extends "properties/base.html" %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/property.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="property-header text-center mb-4">
+        <h1 class="display-5 fw-bold">{{ property.title }}</h1>
+        <h3 class="fw-light">
+            <i class="bi bi-geo-alt-fill"></i> {{ property.neighborhood }}, {{ property.country }}
+        </h3>
+    </div>
+
+    <div class="row">
+        <!-- Image Gallery -->
+        <div class="col-lg-8">
+            <div id="propertyCarousel" class="carousel slide shadow rounded" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    {% for image in property.images %}
+                    <div class="carousel-item {% if loop.first %}active{% endif %}">
+                        <img src="{{ image.filename }}" class="d-block w-100 rounded" alt="{{ property.title }}" style="max-height: 500px; object-fit: cover;">
+                    </div>
+                    {% endfor %}
+                </div>
+                {% if property.images|length > 1 %}
+                <button class="carousel-control-prev" type="button" data-bs-target="#propertyCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#propertyCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                </button>
+                {% endif %}
+            </div>
+
+            <!-- Property Description -->
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h3 class="section-title">{{ _('Description') }}</h3>
+                    {% if property.description %}
+                    <p class="property-description">{{ property.description }}</p>
+                    {% else %}
+                    <p class="text-muted">{{ _('Aucune description disponible pour cette propriété.') }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Property Features -->
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h3 class="section-title">{{ _('Caractéristiques') }}</h3>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                {% if property.rooms %}
+                                <li class="mb-2"><i class="bi bi-door-closed-fill text-primary"></i> {{ property.rooms }} {{ _('chambre' if property.rooms == 1 else 'chambres') }}</li>
+                                {% endif %}
+                                {% if property.bathrooms %}
+                                <li class="mb-2"><i class="bi bi-badge-wc text-primary"></i> {{ property.bathrooms }} {{ _('salle de bain' if property.bathrooms == 1 else 'salles de bain') }}</li>
+                                {% endif %}
+                                {% if property.surface %}
+                                <li class="mb-2"><i class="bi bi-rulers text-primary"></i> {{ property.surface }} m²</li>
+                                {% endif %}
+                                <li class="mb-2"><i class="bi bi-building text-primary"></i> {{ property.property_type }}</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                {% if property.has_water %}
+                                <li class="mb-2"><i class="bi bi-droplet-fill text-primary"></i> {{ _('Eau courante') }}</li>
+                                {% endif %}
+                                {% if property.has_electricity %}
+                                <li class="mb-2"><i class="bi bi-lightning-charge-fill text-primary"></i> {{ _('Électricité') }}</li>
+                                {% endif %}
+                                {% if property.has_courtyard %}
+                                <li class="mb-2"><i class="bi bi-tree-fill text-primary"></i> {{ _('Cour') }}</li>
+                                {% endif %}
+                                {% if property.shower_type %}
+                                <li class="mb-2"><i class="bi bi-shower text-primary"></i> {{ _('Douche') }} {{ property.shower_type }}</li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Location Map (placeholder) -->
+            {% if property.exact_address %}
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h3 class="section-title">{{ _('Localisation') }}</h3>
+                    <p><i class="bi bi-geo-alt-fill text-danger"></i> {{ property.exact_address }}</p>
+                    <div class="ratio ratio-16x9 bg-light rounded">
+                        <div class="d-flex justify-content-center align-items-center text-muted">
+                            <i class="bi bi-map fs-1"></i>
+                            <span class="ms-2">{{ _('Carte non disponible') }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- User Reviews -->
+            {% if property.reviews %}
+            <div class="card mt-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h3 class="section-title mb-0">{{ _('Avis') }}</h3>
+                        <div>
+                            <span class="text-warning"><i class="bi bi-star-fill"></i> {{ property.average_rating }}</span>
+                            <small class="text-muted">({{ property.review_count }} {{ _('avis') }})</small>
+                        </div>
+                    </div>
+                    {% for review in property.reviews %}
+                    <div class="border-bottom pb-3 mb-3">
+                        <div class="d-flex justify-content-between">
+                            <h5>{{ review.user.username }}</h5>
+                            <span class="text-warning">
+                                {% for i in range(1, 6) %}
+                                <i class="bi bi-star{% if i <= review.rating %}-fill{% endif %}"></i>
+                                {% endfor %}
+                            </span>
+                        </div>
+                        <p class="mb-0">{{ review.comment }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Right Sidebar with Key Info -->
+        <div class="col-lg-4 my-4">
+            <!-- Price and Actions Card -->
+            <div class="card shadow-sm" style="top: 20px;">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <span class="badge bg-{{ 'success' if property.is_available else 'secondary' }}">
+                                {{ 'Disponible' if property.is_available else 'Indisponible' }}
+                            </span>
+                            <span class="badge bg-primary ms-1">{{ property.transaction_type }}</span>
+                        </div>
+                        <div class="d-flex gap-2">
+                            {% if current_user.id == property.owner_id %}
+                            <a href="{{ url_for('property.edit_property', property_id=property.id) }}" class="btn btn-sm btn-outline-secondary" title="Edit">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <button 
+                                class="btn btn-sm btn-outline-danger" 
+                                title="Delete" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#deletePropertyModal{{ property.id }}">
+                                <i class="bi bi-trash"></i>
+                            </buttont>
+                            {% endif %}
+                            <button class="btn btn-sm btn-outline-primary favorite-btn"
+                                data-property-id="{{ property.id }}"
+                                aria-label="{{ _('Ajouter aux favoris') }}">
+                                <i class="bi {% if current_user.is_authenticated and property in current_user.favorite_properties %}bi-heart-fill text-danger{% else %}bi-heart{% endif %}"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="text-center my-4">
+                        <div class="price-highlight">
+                            {{ property.price|format_currency(property.currency) }}{{ property.transaction_type|transaction_suffix }}
+                        </div>
+                        {% if property.transaction_type.lower() == _('à louer') %}
+                        <small class="text-muted">{{ _('Prix mensuel') }}</small>
+                        {% endif %}
+                    </div>
+
+                    <!-- Contact Information -->
+                    <div class="contact-card mt-3">
+                        <h5 class="mb-3"><i class="bi bi-person-lines-fill"></i> Contact</h5>
+                        {% if property.whatsapp_contact %}
+                        <a href="https://wa.me/{{ property.whatsapp_contact }}" class="btn btn-success w-100 mb-2">
+                            <i class="bi bi-whatsapp"></i> {{ _('WhatsApp') }}
+                        </a>
+                        {% endif %}
+                        {% if property.phone_contact %}
+                        <a href="tel:{{ property.phone_contact }}" class="btn btn-primary w-100">
+                            <i class="bi bi-telephone"></i> {{ _('Appeler') }}
+                        </a>
+                        {% endif %}
+                    </div>
+
+                    <!-- Quick Facts -->
+                    <div class="mt-4">
+                        <h5><i class="bi bi-info-circle"></i> {{ _('En bref') }}</h5>
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><i class="bi bi-calendar"></i> Publié le {{ property.created_at.strftime('%d/%m/%Y') }}</li>
+                            <li class="mb-2"><i class="bi bi-building"></i> {{ property.property_type }}</li>
+                            <li class="mb-2"><i class="bi bi-geo"></i> {{ property.neighborhood }}</li>
+                            <li><i class="bi bi-tag"></i> {{ property.transaction_type }}</li>
+                        </ul>
+                    </div>
+
+                    <a href="{{ url_for('main.explore') }}" class="btn btn-outline-secondary w-100 mt-3">
+                        <i class="bi bi-arrow-left"></i> {{ _('Retour à la liste') }}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="py-5"></div>
+
+{% include 'properties/delete_property.html' %}
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/libs/bootstrap.bundle.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/libs/popper.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/libs/autosize.min.js') }}"></script>
+{% endblock %}

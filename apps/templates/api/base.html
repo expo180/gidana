@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="{{ get_locale() }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='icons/font/bootstrap-icons.css') }}">
+    {% block styles %}{% endblock %}
+</head>
+<body>
+    <div class="container d-flex flex-column min-vh-100">
+        <div class="content flex-grow-1 py-4">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+    {% block scripts %}{% endblock %}
+    <footer class="d-flex justify-content-center">
+        <p class="mt-5 mb-3 text-body-secondary">&copy; {{ year }} Rumbu Payments Limited</p>
+    </footer>
+</body>
+</html>
