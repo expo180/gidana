@@ -1,5 +1,0 @@
-improve app performance with caching
-add workers to the app
-deploy the app on Play Store and App Store
-
-start preparing the Ad;
