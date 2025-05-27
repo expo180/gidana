@@ -10,7 +10,12 @@
 
         <div class="text-center">
             <span class="fw-bold fs-4 text-success d-block mb-2">Gidana</span>
-            <h1 class="h3 mb-3 fw-normal">{{ _('Connexion') }}</h1>
+            <h1 class="h3 mb-3 fw-normal">
+                <a href="{{ request.referrer or url_for('main.home') }}" class="text-decoration-none me-2">
+                    <i class="bi bi-arrow-left fs-4 text-success"></i>
+                </a>
+                {{ _('Connexion') }}
+            </h1>
         </div>
 
 

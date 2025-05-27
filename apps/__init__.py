@@ -79,6 +79,11 @@ def create_app(development=True, template_folder='templates', static_folder='sta
         """
         directory = os.path.join(current_app.root_path, 'static', folder)
         return send_from_directory(directory, filename)
+    
+    @app.route('/sw.js')
+    def serve_sw():
+        return send_from_directory(current_app.root_path, 'sw.js', mimetype='application/javascript')
+
 
     @app.context_processor
     def inject_current_year():

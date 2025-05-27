@@ -72,6 +72,21 @@
                     <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="App Logo" class="logo">
                 -->
             </a>
+
+            <div class="header-links d-flex align-items-center d-none d-md-flex gap-4">
+                <a href="{{ url_for('main.home') }}" class="header-link {% if request.path == url_for('main.home') %}selected-tab{% endif %}">
+                    {{ _('Accueil') }}
+                </a>
+                <a href="{{ url_for('main.explore') }}" class="header-link {% if request.path == url_for('main.explore') %}selected-tab{% endif %}">
+                    {{ _('Explorer') }}
+                </a>
+                <a href="{{ url_for('main.favourites') }}" class="header-link {% if request.path == url_for('main.favourites') %}selected-tab{% endif %}">
+                    {{ _('Favoris') }}
+                </a>
+            </div>
+
+
+
             
             <div class="d-flex align-items-center">
                 {% if current_user.is_authenticated %}
@@ -80,11 +95,15 @@
                         title="{{ _('Ajouter une propriété') }}">
                         <i class="bi bi-plus-lg"></i>
                     </a>
-                {% endif %}
                     <a href="{{ url_for('main.user_settings') }}">
-                        <img src="{{ current_user.profile_picture or url_for('static', filename='feedbacks/account_circle_dark.svg') if current_user.is_authenticated else url_for('static', filename='feedbacks/account_circle_dark.svg') }}" 
-                         class="rounded-circle" width="36" height="36" alt="{{ _('Profil') }}">
+                        <img src="{{ current_user.profile_picture or url_for('static', filename='feedbacks/account_circle_dark.svg') }}" 
+                        class="rounded-circle" width="36" height="36" alt="{{ _('Profil') }}">
                     </a>
+                {% else %}
+                    <a href="{{ url_for('auth.login') }}" title="{{ _('Se connecter') }}">
+                        <i class="bi bi-person-circle" style="font-size: 1.5rem; color: #6c757d;"></i>
+                    </a>
+                {% endif %}
             </div>
         </div>
     </header>
@@ -93,7 +112,7 @@
             {% block content %}{% endblock %}
         </div>
 
-        <div class="bg-light fixed-bottom py-2 shadow-lg">
+        <div class="bg-light fixed-bottom py-2 shadow-lg d-md-none">
             <div class="d-flex justify-content-around text-center">
                 <a href="{{ url_for('main.home') }}" class="text-decoration-none flex-fill py-2">
                     <i class="bi {% if request.path == url_for('main.home') %}bi-house-fill selected-tab{% else %}bi-house text-dark{% endif %} fs-4"></i>
@@ -156,6 +175,11 @@
         <script src="{{ url_for('static', filename='js/libs/bootstrap.bundle.min.js') }}"></script>
         <script src="{{ url_for('static', filename='js/libs/popper.min.js') }}"></script>
         <script src="{{ url_for('static', filename='js/libs/autosize.min.js') }}"></script>
+        <script>
+            if (typeof navigator.serviceWorker !== 'undefined') {
+                navigator.serviceWorker.register('sw.js')
+            }
+        </script>
     {% endblock %}
 </body>
 </html>

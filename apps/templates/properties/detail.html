@@ -7,7 +7,12 @@
 {% block content %}
 <div class="container">
     <div class="property-header text-center mb-4">
-        <h1 class="display-5 fw-bold">{{ property.title }}</h1>
+        <h1 class="display-5 fw-bold">
+            <a href="{{ request.referrer or url_for('main.home') }}" class="text-decoration-none me-2">
+                <i class="bi bi-arrow-left fs-4 text-success"></i>
+            </a>
+            {{ property.title }}
+        </h1>
         <h3 class="fw-light">
             <i class="bi bi-geo-alt-fill"></i> {{ property.neighborhood }}, {{ property.country }}
         </h3>

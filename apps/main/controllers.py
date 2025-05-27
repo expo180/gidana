@@ -47,7 +47,7 @@ def home():
     
     return render_template(
         'main/home.html',
-        title=_('Accueil'),
+        title=_('Gidana | Chercher votre espace de privé de rêve'),
         recommended_properties=recommended_properties
     )
 
@@ -117,7 +117,7 @@ def explore():
 
     return render_template(
         'main/explore.html',
-        title=_('Explorer'),
+        title=_('Gidana | Explorer les propriétés'),
         properties=properties,
         pagination=pagination,
         recent_searches=recent_searches
@@ -207,7 +207,7 @@ def favourites():
     
     return render_template(
         'main/favourites.html',
-        title=_('Favoris'),
+        title=_('Gidana | Favoris'),
         favorites=favorites,
         pagination=pagination
     )
@@ -340,12 +340,16 @@ def user_settings():
 
     return render_template(
         'main/user_settings.html',
-        title=_('Paramètres'),
+        title=_('Gidana | Paramètres utilisateur'),
         form=form
     )
 
 
+@main.route('/offline')
+def offline():
+    return render_template('main/offline.html', title=_('Gidana | Hors ligne'))
+
 
 @main.route('/terms-and-conditions')
 def terms_and_conditions():
-    return render_template('main/terms_and_conditions.html', title=_('Termes et Conditions'))
+    return render_template('main/terms_and_conditions.html', title=_('Gidana | Termes et Conditions'))

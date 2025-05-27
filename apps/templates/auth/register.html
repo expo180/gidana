@@ -11,9 +11,18 @@
     <form method="POST" class="w-100">
         {{ form.hidden_tag() }}
 
-        <div class="text-center">
+        <div class="text-center mb-4">
             <span class="fw-bold fs-4 text-success d-block mb-2">Gidana</span>
-            <h1 class="h3 mb-3 fw-normal">{{ _('Nouveau Compte') }}</h1>
+            <div class="d-flex justify-content-center align-items-center mb-3">
+                <a href="{{ request.referrer or url_for('main.home') }}" class="text-decoration-none me-2 position-absolute start-0 ms-3">
+                    <i class="bi bi-arrow-left fs-4 text-success"></i>
+                </a>
+                <h1 class="h3 mb-0 fw-normal">{{ _('S\'inscrire') }}</h1>
+            </div>
+            
+            <p class="text-muted px-4">
+                {{ _('Créez un compte pour publier des maisons à louer, gérer vos propriétés, et enregistrer vos favoris.') }}
+            </p>
         </div>
 
         <div class="form-floating mb-2">

@@ -1,0 +1,64 @@
+{% extends "main/base.html" %}
+{% block styles %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+    <title>{{ title }}</title>
+    <style>
+        .offline-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+        .offline-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            color: #6c757d;
+        }
+        .offline-btn {
+            margin-top: 2rem;
+            padding: 10px 25px;
+        }
+        .offline-content {
+            max-width: 500px;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="offline-container">
+    <div class="offline-content">
+        <!-- Bootstrap wifi-off icon -->
+        <div class="offline-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="bi bi-wifi-off" viewBox="0 0 16 16">
+                <path d="M10.706 3.294A12.6 12.6 0 0 0 8 3c-1.905 0-3.68.56-5.166 1.526a.5.5 0 0 0-.063.63l.652 1.028a.5.5 0 0 0 .577.22 11.2 11.2 0 0 1 1.733-.495.5.5 0 0 0 .165-.857l-.642-.4a9.9 9.9 0 0 0-1.71.57.5.5 0 0 0-.14.975 8.8 8.8 0 0 0 1.316.65.5.5 0 0 0 .186-.619l-.756-1.193A11.7 11.7 0 0 1 8 4c.819 0 1.606.107 2.347.306a.5.5 0 0 0 .262-.943l-.776-.497Zm-.122 1.944a.5.5 0 0 0 .049.94 6.7 6.7 0 0 1 1.48.339.5.5 0 1 0 .239-.971 7.6 7.6 0 0 0-1.76-.37.5.5 0 0 0-.008.062ZM8 6c-.184 0-.365.006-.543.017a.5.5 0 0 0-.11.986 5.5 5.5 0 0 1 1.089.26.5.5 0 0 0 .254-.966A6.6 6.6 0 0 0 8 6Zm-3.825.502a.5.5 0 0 0-.254.966A5.5 5.5 0 0 1 5.71 9.03a.5.5 0 0 0 .11-.986 6.6 6.6 0 0 0-1.644-.542Z"/>
+                <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1z"/>
+            </svg>
+        </div>
+        
+        <h2 class="mb-3">{{ _('Vous êtes hors ligne') }}</h2>
+        <p class="text-muted mb-4">
+            {{ _('Il semble que vous ayez perdu votre connexion Internet. Certaines fonctionnalités peuvent ne pas être disponibles.') }}
+        </p>
+        
+        <button onclick="window.location.reload()" class="btn btn-success offline-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-clockwise me-2" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2z"/>
+                <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466"/>
+            </svg>
+            {{ _('Réessayer') }}
+        </button>
+        
+        <div class="mt-4 small text-muted">
+            <p class="text-start">{{ _('Conseils :') }}</p>
+            <ul class="text-start">
+                <li>{{ _('Vérifiez votre connexion Wi-Fi ou mobile') }}</li>
+                <li>{{ _('Redémarrez votre routeur si nécessaire') }}</li>
+                <li>{{ _('Essayez de désactiver le mode avion') }}</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

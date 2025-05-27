@@ -78,15 +78,17 @@
         </div>
 
         <!-- Price + Action -->
-        <div class="d-flex justify-content-between align-items-center mt-2">
-            <span class="fw-bold text-success">
-                {{ property.price|format_currency(property.currency) }}{{ property.transaction_type|transaction_suffix }}
-                {{ _('/mois' if property.transaction_type == 'À louer')  }}
-            </span>
-            <a href="{{ url_for('property.detail', property_id=property.id) }}"
-               class="btn btn-sm btn-outline-success rounded-pill px-3">
-                {{ _('Voir') }}
-            </a>
+        <div class="mt-auto pt-2">
+            <div class="d-flex justify-content-between align-items-center">
+                <span class="fw-bold text-success">
+                    {{ property.price|format_currency(property.currency) }}{{ property.transaction_type|transaction_suffix }}
+                    {{ _('/mois' if property.transaction_type == 'À louer')  }}
+                </span>
+                <a href="{{ url_for('property.detail', property_id=property.id) }}"
+                   class="btn btn-sm btn-outline-success rounded-pill px-3">
+                    {{ _('Voir') }}
+                </a>
+            </div>
         </div>
     </div>
 </div>

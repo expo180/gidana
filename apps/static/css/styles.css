@@ -9,6 +9,19 @@
     transition: all 0.3s ease;
 }
 
+.header-link {
+    text-decoration: none;
+    color: #212529;
+    font-weight: 500;
+    padding: 0.25rem 0.5rem;
+    transition: color 0.2s ease-in-out;
+}
+
+.header-link:hover {
+    color: #0d5c03;
+    text-decoration: none;
+}
+
 .selected-tab::after {
     content: '';
     position: absolute;
@@ -139,4 +152,10 @@
 
 .add-property-btn:active {
     transform: scale(0.98);
+}
+
+@media (max-width: 767.98px) {
+    .header-links {
+        display: none !important;
+    }
 }
