@@ -83,6 +83,10 @@ def create_app(development=True, template_folder='templates', static_folder='sta
     @app.route('/sw.js')
     def serve_sw():
         return send_from_directory(current_app.root_path, 'sw.js', mimetype='application/javascript')
+    
+    @app.route('/manifest.json')
+    def manifest():
+        return send_from_directory(current_app.root_path, 'manifest.json', mimetype='application/json')
 
 
     @app.context_processor
